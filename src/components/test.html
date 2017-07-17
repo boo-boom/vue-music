@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    qasedqw
+</body>
+<script>
+    var a = [
+        { title: 'C', name: 'c-1' },
+        { title: 'A', name: 'a-1' },
+        { title: 'B', name: 'b-1' },
+        { title: 'B', name: 'b-2' },
+        { title: 'A', name: 'a-2' }
+    ];
+
+    var map = {};
+    a.forEach((item, index) => {
+        if (!map[item.title]) {
+            map[item.title] = {
+                title: item.title,
+                items: []
+            }
+        }
+        map[item.title].items.push({
+            name: item.name
+        });
+    });
+    var s1 = [];
+    for (var key in map) {
+        if (map[key].title.match(/[a-zA-Z]/)) {
+            s1.push(map[key]);
+        }
+    }
+     s1.sort(function(a, b){
+        return a.title.charCodeAt(0) - b.title.charCodeAt(0);
+    }); 
+    console.log(JSON.stringify(s1));
+
+</script>
+
+</html>

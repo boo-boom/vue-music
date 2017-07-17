@@ -21,12 +21,23 @@ export default {
         click: {
             type: Boolean,
             default: true
+        },
+        refreshDelay: {
+            type: Number,
+            default: 20
         }
     },
     mounted() { 
         setTimeout(() => {
             this._initScroll();
-        }, 20);
+        }, this.refreshDelay);
+    },
+    watch: {
+        data(){
+            setTimeout(() => {
+                this.refresh();
+            }, this.refreshDelay);
+        }
     },
     methods: {
         _initScroll() {

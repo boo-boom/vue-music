@@ -1,30 +1,21 @@
 <template>
-    <div class="list-view">
+    <scroll class="listview" :data="data">
         <ul>
-            <li class="list-group">
-                <h2 class="list-group-title">A</h2>
+            <li class="list-group" v-for="(group, groupIndex) in data" :key="groupIndex">
+                <h2 class="list-group-title">{{group.title}}</h2>
                 <ul>
-                    <li class="list-group-item">
-                        <img class="avatar" src="~assets/image/default.png">
-                        <span class="name">sadasdsad</span>
-                    </li>
-                </ul>
-            </li>
-            <li class="list-group">
-                <h2 class="list-group-title">A</h2>
-                <ul>
-                    <li class="list-group-item">
-                        <img class="avatar" src="~assets/image/default.png">
-                        <span class="name">sadasdsad</span>
+                    <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
+                        <img class="avatar" v-lazy="item.avatar">
+                        <span class="name">{{item.name}}</span>
                     </li>
                 </ul>
             </li>
         </ul>
-    </div>
+    </scroll>
 </template>
 
 <script>
-import BScroll from 'better-scroll';
+import Scroll from 'base/scroll';
 
 export default {
     name: 'listview',
@@ -34,8 +25,9 @@ export default {
             default: []
         }
     },
+    components: { Scroll },
     methods: {
-        
+
     }
 }
 </script>
@@ -43,7 +35,12 @@ export default {
 <style rel="stylesheet/less" lang="less" scoped>
 @import '~assets/css/variable';
 
-.list-view {
+.listview {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: @color-background;
     .list-group {
         padding-bottom: 3rem;
         .list-group-title {

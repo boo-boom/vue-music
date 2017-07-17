@@ -31,7 +31,7 @@ export default {
         },
         _normalizeSinger(list) {
             const HOT_TITLE = '热门';
-            const HOT_LEN = 1;
+            const HOT_LEN = 10;
             let map = {
                 hot: {
                     title: HOT_TITLE,
@@ -45,36 +45,49 @@ export default {
                         name: item.Fsinger_name,
                     }));
                 }
-                let key = item.Findex;
+                const key = item.Findex;
+                // 没有map[key]时创建，for a , b ...
+                // 如map.a不存在时创建一个对象
                 if (!map[key]) {
                     map[key] = {
                         title: key,
                         items: []
                     }
-                    map[key].items.push(new Singer({
-                        id: item.Fsinger_mid,
-                        name: item.Fsinger_name,
-                    }));
                 }
+                // 如map.a不存在时会执行上面的判断创建对象后再添加属性
+                // 如map.a存在时会直接给其添加属性
+                map[key].items.push(new Singer({
+                    id: item.Fsinger_mid,
+                    name: item.Fsinger_name,
+                }));
             });
 
             // 排序
             let hot = [];
             let ret = [];
-            for(let key in map){
+            for (let key in map) {
                 let val = map[key];
-                if(val.title.match(/[a-zA-Z]/)){
-                    
+                if (val.title.match(/[a-zA-Z]/)) {
+                    ret.push(val);
+                } else if (val.title === HOT_TITLE) {
+                    hot.push(val);
                 }
             }
-            console.log(JSON.stringify(map));
-            return list;
+            ret.sort((a, b) => {
+                return a.title.charCodeAt(0) - b.title.charCodeAt(0);
+            });
+            return hot.concat(ret);
         }
     }
 }
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-
+    .singer{
+        position: fixed;
+        top: 8.8rem;
+        bottom: 0;
+        width: 100%;
+    }
 </style>
 
