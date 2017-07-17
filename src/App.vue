@@ -2,7 +2,9 @@
   <div id="app">
     <MHeader></MHeader>
     <Tab></Tab>
-    <router-view></router-view>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
@@ -15,6 +17,6 @@ export default {
 }
 </script>
 
-<style>
+<style rel="stylesheet/less" lang="less">
 
 </style>
