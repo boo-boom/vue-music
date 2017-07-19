@@ -37,7 +37,7 @@ export default {
                     title: HOT_TITLE,
                     items: []
                 }
-            }
+            };
             list.forEach(function (item, index) {
                 if (index < HOT_LEN) {
                     map.hot.items.push(new Singer({
