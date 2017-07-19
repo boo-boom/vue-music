@@ -2,46 +2,96 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    ul {
+      font-size: 0;
+    }
+    li {
+      display: inline-block;
+      list-style: none;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+    li.active {
+      background: #7e8c8d;
+    }
+  </style>
 </head>
 
 <body>
-    test-1
+<ul id="ul1">
+  <li class="active">1</li>
+  <li>2</li>
+  <li>3</li>
+  <li>4</li>
+  <li>5</li>
+</ul>
+
 </body>
 <script>
-    var a = [
-        { title: 'C', name: 'c-1' },
-        { title: 'A', name: 'a-1' },
-        { title: 'B', name: 'b-1' },
-        { title: 'B', name: 'b-2' },
-        { title: 'A', name: 'a-2' }
-    ];
+  var ul1 = document.querySelector('#ul1');
+  var items = ul1.querySelectorAll('li');
+  var touch = {};
+  for (var i = 0; i < items.length; i++) {
+    items[i].index = i;
+    items[i].addEventListener('touchstart', function (e) {
+      var firstTouch = e.touches[0];
+      touch.x1 = firstTouch.clientX;
+      touch.curIndex = this.index;
+    });
+    items[i].addEventListener('touchmove', function (e) {
+      var firstTouch = e.touches[0];
+      touch.x2 = firstTouch.clientX;
+      var delta = ((touch.x2 - touch.x1) / 20 | 0) + touch.curIndex;
+      items[delta].className = 'active';
+      console.log(delta);
+    });
+  }
 
-    var map = {};
-    a.forEach((item, index) => {
-        if (!map[item.title]) {
-            map[item.title] = {
-                title: item.title,
-                items: []
-            }
-        }
-        map[item.title].items.push({
-            name: item.name
-        });
-    });
-    var s1 = [];
-    for (var key in map) {
-        if (map[key].title.match(/[a-zA-Z]/)) {
-            s1.push(map[key]);
-        }
+  var a = [
+    {title: 'C', name: 'c-1'},
+    {title: 'A', name: 'a-1'},
+    {title: 'B', name: 'b-1'},
+    {title: 'B', name: 'b-2'},
+    {title: 'A', name: 'a-2'}
+  ];
+
+  var map = {};
+  a.forEach((item, index) => {
+    if (!map[item.title]) {
+      map[item.title] = {
+        title: item.title,
+        items: []
+      }
     }
-     s1.sort(function(a, b){
-        return a.title.charCodeAt(0) - b.title.charCodeAt(0);
+    map[item.title].items.push({
+      name: item.name
     });
-    console.log(JSON.stringify(s1));
+  });
+  var s1 = [];
+  for (var key in map) {
+    if (map[key].title.match(/[a-zA-Z]/)) {
+      s1.push(map[key]);
+    }
+  }
+  s1.sort(function (a, b) {
+    return a.title.charCodeAt(0) - b.title.charCodeAt(0);
+  });
+  console.log(JSON.stringify(s1));
 
 </script>
 

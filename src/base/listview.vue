@@ -1,128 +1,183 @@
 <template>
-    <scroll class="listview" :data="data">
+  <scroll class="listview" :data="data" :listenScroll="listenScroll" ref="listview" @scroll="scroll">
+    <ul>
+      <li class="list-group" v-for="(group, groupIndex) in data" :key="groupIndex" ref="listGroup">
+        <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-            <li class="list-group" v-for="(group, groupIndex) in data" :key="groupIndex">
-                <h2 class="list-group-title">{{group.title}}</h2>
-                <ul>
-                    <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
-                        <img class="avatar" v-lazy="item.avatar">
-                        <span class="name">{{item.name}}</span>
-                    </li>
-                </ul>
-            </li>
+          <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
+            <img class="avatar" v-lazy="item.avatar">
+            <span class="name">{{item.name}}</span>
+          </li>
         </ul>
-        <div class="list-shortcut">
-            <ul>
-                <li class="item" v-for="(item, index) in shortcutList" :key="index" :class="{'current':currentIndex==index}">{{item}}</li>
-            </ul>
-        </div>
-        <div class="loading-container" v-show="!data.length">
-            <loading></loading>
-        </div>
-    </scroll>
+      </li>
+    </ul>
+    <div class="list-shortcut">
+      <ul>
+        <li class="item" v-for="(item, index) in shortcutList" :key="index" :class="{'current':currentIndex==index}"
+            :data-index="index" @touchstart.stop.prevent="onShortcutTouchStart"
+            @touchmove.stop.prevent="onShortcutTouchMove"
+            ref="shortcutItem">
+          {{item}}
+        </li>
+      </ul>
+    </div>
+    <div class="loading-container" v-show="!data.length">
+      <loading></loading>
+    </div>
+  </scroll>
 </template>
 
 <script>
-import Scroll from 'base/scroll';
-import Loading from 'base/loading';
+  import Scroll from 'base/scroll';
+  import Loading from 'base/loading';
+  import {getData} from 'assets/js/base';
 
-export default {
+  export default {
     name: 'listview',
     props: {
-        data: {
-            type: Array,
-            default: []
-        }
+      data: {
+        type: Array,
+        default: []
+      }
     },
-    data(){
-        return {
-            currentIndex: 0
-        }
+    data() {
+      return {
+        currentIndex: 0,
+        scrollY: 0,
+      }
     },
-    components: { Scroll, Loading },
+    created() {
+      this.touch = {};
+      this.listHeight = [];
+      this.listenScroll = true;
+    },
+    components: {Scroll, Loading},
     methods: {
-
+      // 按下
+      onShortcutTouchStart(e) {
+        let anchorIndex = getData(e.target, 'data-index');
+        this.touch.anchorIndex = parseInt(anchorIndex);
+        let firstTouch = e.touches[0];
+        this.touch.y1 = firstTouch.clientY;
+        this.touch.anchor_height = this.$refs.shortcutItem[0].clientHeight;
+        this._scrollTo(anchorIndex);
+      },
+      // 滑动
+      onShortcutTouchMove(e) {
+        let firstTouch = e.touches[0];
+        this.touch.y2 = firstTouch.clientY;
+        //let delta = parseInt((this.touch.y2 - this.touch.y1) / this.touch.anchor_height);
+        let delta = (this.touch.y2 - this.touch.y1) / this.touch.anchor_height | 0;
+        let anchorIndex = delta + this.touch.anchorIndex;
+        this._scrollTo(anchorIndex);
+      },
+      // 获取滚动距离
+      scroll(pos){
+        this.scrollY = pos.y;
+        console.log(this.scrollY);
+      },
+      // 获取每个列表的高度并添加到数组中
+      _calculateHeight() {
+        const list = this.$refs.listGroup;
+        let height = 0;
+        this.listHeight.push(height);
+        for (let i = 0; i < list.length; i++) {
+          height = list[i].clientHeight;
+          this.listHeight.push(height);
+        }
+      },
+      // 滑动至指定element
+      _scrollTo(index) {
+        console.log('index:' + index);
+        this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 400);
+      }
+    },
+    watch: {
+      data() {
+        this.$nextTick(() => {
+          this._calculateHeight();
+        })
+      }
     },
     computed: {
-        shortcutList(){
-            return this.data.map((group) => {
-                return group.title.substr(0, 1);
-            });
-        }
+      shortcutList() {
+        return this.data.map((group) => {
+          return group.title.substr(0, 1);
+        });
+      }
     }
-}
+  }
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-@import '~assets/css/variable';
-
-.listview {
+  @import '~assets/css/variable';
+  .listview {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
     background: @color-background;
     .list-group {
-        padding-bottom: 3rem;
-        .list-group-title {
-            height: 3rem;
-            line-height: 3rem;
-            padding-left: 2rem;
-            font-size: @font-size-small;
-            color: @color-text-l;
-            background: @color-highlight-background;
+      padding-bottom: 3rem;
+      .list-group-title {
+        height: 3rem;
+        line-height: 3rem;
+        padding-left: 2rem;
+        font-size: @font-size-small;
+        color: @color-text-l;
+        background: @color-highlight-background;
+      }
+      .list-group-item {
+        display: flex;
+        align-items: center;
+        padding: 2rem 0 0 3rem;
+        .avatar {
+          flex: 0 0 5rem;
+          width: 5rem;
+          height: 5rem;
+          border-radius: 50%;
+          overflow: hidden;
+          & > img {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
         }
-        .list-group-item {
-            display: flex;
-            align-items: center;
-            padding: 2rem 0 0 3rem;
-            .avatar {
-                flex: 0 0 5rem;
-                width: 5rem;
-                height: 5rem;
-                border-radius: 50%;
-                overflow: hidden;
-                &>img {
-                    display: block;
-                    width: 100%;
-                    height: 100%;
-                }
-            }
-            .name {
-                margin-left: 2rem;
-                color: @color-text-l;
-                font-size: @font-size-medium;
-            }
+        .name {
+          margin-left: 2rem;
+          color: @color-text-l;
+          font-size: @font-size-medium;
         }
+      }
     }
     .list-shortcut {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        z-index: 30;
-        transform: translateY(-50%);
-        width: 2rem;
-        padding: 2rem 0;
-        border-radius: 1rem;
-        text-align: center;
-        background: @color-background-d;
-        font-family: Helvetica;
-        .item {
-            //font-size: 20rem;
-            padding: 0.3rem;
-            line-height: 1;
-            color: @color-text-l;
-            font-size: @font-size-small;
-            &.current{
-                color: @color-theme;
-            }
+      position: absolute;
+      right: 0;
+      top: 50%;
+      z-index: 30;
+      transform: translateY(-50%);
+      width: 2rem;
+      padding: 2rem 0;
+      border-radius: 1rem;
+      text-align: center;
+      background: @color-background-d;
+      font-family: Helvetica;
+      .item {
+        //font-size: 20rem;
+        padding: 0.3rem;
+        line-height: 1;
+        color: @color-text-l;
+        font-size: @font-size-small;
+        &.current {
+          color: @color-theme;
         }
+      }
     }
     .loading-container {
-        position: absolute;
-        width: 100%;
-        top: 50%;
-        transform: translateY(-50%);
+      position: absolute;
+      width: 100%;
+      top: 50%;
+      transform: translateY(-50%);
     }
-}
+  }
 </style>
