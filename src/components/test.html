@@ -11,9 +11,11 @@
       margin: 0;
       padding: 0;
     }
+
     ul {
       font-size: 0;
     }
+
     li {
       display: inline-block;
       list-style: none;
@@ -26,6 +28,7 @@
       font-size: 12px;
       box-sizing: border-box;
     }
+
     li.active {
       background: #7e8c8d;
     }
@@ -33,13 +36,13 @@
 </head>
 
 <body>
-<ul id="ul1">
-  <li class="active">1</li>
-  <li>2</li>
-  <li>3</li>
-  <li>4</li>
-  <li>5</li>
-</ul>
+  <ul id="ul1">
+    <li class="active">1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+  </ul>
 
 </body>
 <script>
@@ -63,11 +66,11 @@
   }
 
   var a = [
-    {title: 'C', name: 'c-1'},
-    {title: 'A', name: 'a-1'},
-    {title: 'B', name: 'b-1'},
-    {title: 'B', name: 'b-2'},
-    {title: 'A', name: 'a-2'}
+    { title: 'C', name: 'c-1' },
+    { title: 'A', name: 'a-1' },
+    { title: 'B', name: 'b-1' },
+    { title: 'B', name: 'b-2' },
+    { title: 'A', name: 'a-2' }
   ];
 
   var map = {};
@@ -92,6 +95,41 @@
     return a.title.charCodeAt(0) - b.title.charCodeAt(0);
   });
   console.log(JSON.stringify(s1));
+
+  // 闭包
+  function student() {
+    var age = 0;
+    return {
+      getAge: function () {
+        return age;
+      },
+      setAge: function (a) {
+        age = a;
+      },
+      addAge: function (b) {
+        age += b;
+      }
+    }
+  }
+  var student1 = student();
+  student1.setAge(10);
+  console.log(student1.getAge());
+  student1.addAge(5);
+  console.log(student1.getAge());
+  var student2 = student();
+  console.log(student2.getAge());
+
+  function test(){
+    var n = 0;
+    function child(){
+      n++;
+      console.log(n);
+    }
+    child();
+    child();
+    child();
+  }
+  test();
 
 </script>
 

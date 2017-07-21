@@ -1,10 +1,10 @@
 <template>
-  <scroll class="listview" :data="data" :listenScroll="listenScroll" ref="listview" @scroll="scroll">
+  <scroll class="listview" :data="data" :listenScroll="listenScroll" :probeType="probeType" ref="listview" @scroll="scroll">
     <ul>
       <li class="list-group" v-for="(group, groupIndex) in data" :key="groupIndex" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
+          <li class="list-group-item" v-for="(item, index) in group.items" :key="index" @click="selectItem(item)">
             <img class="avatar" v-lazy="item.avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -20,6 +20,9 @@
           {{item}}
         </li>
       </ul>
+    </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixedDom">
+      <div class="fixed-title">{{fixedTitle}}</div>
     </div>
     <div class="loading-container" v-show="!data.length">
       <loading></loading>
@@ -44,21 +47,28 @@
       return {
         currentIndex: 0,
         scrollY: 0,
+        fixedHeight: 0,
+        diff: 0
       }
     },
     created() {
       this.touch = {};
       this.listHeight = [];
       this.listenScroll = true;
+      this.probeType = 3;
     },
     components: {Scroll, Loading},
     methods: {
+      selectItem(item){
+        this.$emit('select', item);
+      },
       // 按下
       onShortcutTouchStart(e) {
         let anchorIndex = getData(e.target, 'data-index');
         this.touch.anchorIndex = parseInt(anchorIndex);
         let firstTouch = e.touches[0];
         this.touch.y1 = firstTouch.clientY;
+        this.currentIndex = anchorIndex;
         this.touch.anchor_height = this.$refs.shortcutItem[0].clientHeight;
         this._scrollTo(anchorIndex);
       },
@@ -72,9 +82,8 @@
         this._scrollTo(anchorIndex);
       },
       // 获取滚动距离
-      scroll(pos){
+      scroll(pos) {
         this.scrollY = pos.y;
-        console.log(this.scrollY);
       },
       // 获取每个列表的高度并添加到数组中
       _calculateHeight() {
@@ -82,13 +91,20 @@
         let height = 0;
         this.listHeight.push(height);
         for (let i = 0; i < list.length; i++) {
-          height = list[i].clientHeight;
+          height += list[i].clientHeight;
           this.listHeight.push(height);
         }
       },
       // 滑动至指定element
       _scrollTo(index) {
-        console.log('index:' + index);
+        if (index < 0){
+          index = 0;
+          return
+        }
+        if(index > this.listHeight.length){
+          index = this.listHeight.length - 2;
+          return
+        }
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 400);
       }
     },
@@ -96,7 +112,28 @@
       data() {
         this.$nextTick(() => {
           this._calculateHeight();
+          this.fixedHeight = this.$refs.fixedDom.clientHeight;
         })
+      },
+      scrollY(newY) {
+        const listHeight = this.listHeight;
+        if (newY > 0) {
+          this.currentIndex = 0;
+          return
+        }
+        for (let i = 0; i < listHeight.length; i++) {
+          let height1 = listHeight[i];
+          let height2 = listHeight[i + 1];
+          if (!height2 || (-newY >= height1 && -newY < height2)) {
+            this.currentIndex = i;
+            this.diff = height2 + newY;
+            return
+          }
+        }
+      },
+      diff(newVal) {
+        let fixedTop = (newVal > 0 && newVal < this.fixedHeight) ? newVal - this.fixedHeight : 0;
+        this.$refs.fixedDom.style.transform = `translate3d(0,${fixedTop}px,0)`;
       }
     },
     computed: {
@@ -104,6 +141,10 @@
         return this.data.map((group) => {
           return group.title.substr(0, 1);
         });
+      },
+      fixedTitle() {
+        if (this.scrollY > 0) return '';
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : '';
       }
     }
   }
@@ -172,6 +213,19 @@
           color: @color-theme;
         }
       }
+    }
+    .list-fixed {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      width: 100%;
+      height: 3rem;
+      line-height: 3rem;
+      padding-left: 2rem;
+      font-size: @font-size-small;
+      color: @color-text-l;
+      background: @color-highlight-background;
     }
     .loading-container {
       position: absolute;
