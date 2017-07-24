@@ -6,6 +6,7 @@
 </template>
 
 <script>
+  import {mapMutations} from 'vuex';
   import {ERR_OK} from 'api/config';
   import ListView from 'base/listview';
   import Singer from 'assets/js/singer';
@@ -23,10 +24,11 @@
       this._getSingerList();
     },
     methods: {
-      selectSinger(singer){
+      selectSinger(singer) {
         this.$router.push({
           path: `/singer/${singer.id}`
         });
+        this.set_singer(singer);
       },
       _getSingerList() {
         getSingerList().then((res) => {
@@ -83,8 +85,9 @@
           return a.title.charCodeAt(0) - b.title.charCodeAt(0);
         });
         return hot.concat(ret);
-      }
-    }
+      },
+      ...mapMutations(['set_singer'])
+    },
   }
 </script>
 

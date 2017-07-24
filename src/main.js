@@ -4,7 +4,7 @@ import router from './router';
 import store from './store';
 import fastclick from 'fastclick';
 import VueLazyLoad from 'vue-lazyload';
-import { DOMLoaded, computedREM } from 'assets/js/base';
+import {DOMLoaded, computedREM} from 'assets/js/base';
 import 'assets/css/common.less';
 
 fastclick.attach(document.body);

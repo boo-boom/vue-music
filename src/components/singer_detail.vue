@@ -1,34 +1,58 @@
 <template>
   <transition name="slide">
-    <div class="singer-detail">
-      <div style="font-size: 30px;">{{test}}||{{testGet}}||{{a1}}||{{b1}}</div>
-      <button @click="testAts">click!</button>
-      <button @click="sda">click!</button>
-      <button @click="fn1">click!</button>
-    </div>
+    <music-list :songs="songs" :name="name" :avatar="avatar"></music-list>
   </transition>
 </template>
 
 <script>
-  import {mapState, mapGetters, mapMutations, mapActions} from 'vuex';
+  import {mapGetters} from 'vuex';
+  import {ERR_OK} from 'api/config';
+  import {createSong} from 'assets/js/song';
+  import {getSingerDetail} from 'api/singer';
+  import MusicList from 'components/music_list';
 
   export default {
     name: 'singerDetail',
-    components: {},
-    computed: {
-      ...mapState(['test']),
-      ...mapGetters(['testGet','a1','b1'])
+    data() {
+      return {
+        songs: []
+      }
+    },
+    components: {MusicList},
+    created() {
+      this._getDetail();
     },
     methods: {
-      ...mapMutations(['testMts','fn1']),
-      ...mapActions(['testAts','sda']),
-      fn1(){
-        let a = {
-          a1: '1',
-          a2: '2'
-        };
-        console.log('j'.concat(a.a1,a.a2));
+      _getDetail() {
+        if (!this.singer.id) {
+          this.$router.push('/singer');
+          return
+        }
+        getSingerDetail(this.singer.id).then((res) => {
+          if (res.code === ERR_OK) {
+            this.songs = this._normalizeSong(res.data.list);
+          }
+        });
+      },
+      _normalizeSong(list) {
+        let ret = [];
+        list.forEach((item, index) => {
+          let musicData = item.musicData;
+          if (musicData.songid && musicData.albummid) {
+            ret.push(createSong(musicData));
+          }
+        });
+        return ret;
       }
+    },
+    computed: {
+      name(){
+        return this.singer.name;
+      },
+      avatar(){
+        return this.singer.avatar;
+      },
+      ...mapGetters(['singer'])
     }
   }
 </script>
@@ -39,14 +63,5 @@
   }
   .slide-enter, .slide-leave-active {
     transform: translate3d(100%, 0, 0);
-  }
-  .singer-detail {
-    position: fixed;
-    top: 8.8rem;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 99;
-    background-color: #ccc;
   }
 </style>
