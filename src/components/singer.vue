@@ -28,7 +28,7 @@
         this.$router.push({
           path: `/singer/${singer.id}`
         });
-        this.set_singer(singer);
+        this.SET_SINGER(singer);
       },
       _getSingerList() {
         getSingerList().then((res) => {
@@ -86,7 +86,7 @@
         });
         return hot.concat(ret);
       },
-      ...mapMutations(['set_singer'])
+      ...mapMutations(['SET_SINGER'])
     },
   }
 </script>
