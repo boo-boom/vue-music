@@ -12,9 +12,9 @@
           <h1 class="title">{{currentSong.name}}</h1>
           <h2 class="subtitle">{{currentSong.singer}}</h2>
         </div>
-        <div class="middle">
+        <div class="middle" ref="middle">
           <div class="middle-l">
-            <div class="cd-wrapper">
+            <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.image">
               </div>
@@ -48,7 +48,7 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center" @click="togglePlaying">
-              <i class="icon-play"></i>
+              <i :class="playIcon"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -70,7 +70,7 @@
           <p class="desc">{{currentSong.singer}}</p>
         </div>
         <div class="control" @click.stop="togglePlaying">
-          <i class="icon-play-mini"></i>
+          <i :class="miniIcon"></i>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -83,13 +83,14 @@
 
 <script>
   import {mapGetters, mapMutations} from 'vuex'
-  import animation from 'create-keyframe-animation'
+  import {prefixStyle} from 'assets/js/base'
+  import animations from 'create-keyframe-animation'
+
+  const transform = prefixStyle('transform');
+  const transition = prefixStyle('transition');
 
   export default {
     name: 'player',
-    updated(){
-      this._getPosScale();
-    },
     methods: {
       back() {
         this.setFullScreen(false);
@@ -101,17 +102,53 @@
         this.setPlayingState(!this.playing);
       },
       enter(el, done) {
+        const {x, y, scale} = this._getPosScale();
+        let animation = {
+          0:{
+            transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
+          },
+          60:{
+            transform: `translate3d(0,0,0) scale(1.1)`
+          },
+          100:{
+            transform: `translate3d(0,0,0) scale(1)`
+          }
+        };
+        animations.registerAnimation({
+          name: 'move',
+          animation,
+          presets: {
+            duration: 400,
+            easing: 'linear'
+          }
+        });
+        animations.runAnimation(this.$refs.cdWrapper, 'move', done);
       },
       afterEnter(el) {
+        animations.unregisterAnimation('move');
+        this.$refs.cdWrapper.style.animation = '';
       },
       leave(el, done) {
+        const {x, y, scale} = this._getPosScale();
+        this.$refs.cdWrapper.style[transition] = 'all 0.4s';
+        this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`;
+        this.$refs.cdWrapper.addEventListener('transitionend', done);
       },
       afterLeave(el) {
+        this.$refs.cdWrapper.style[transform] = '';
       },
-      _getPosScale(){
+      _getPosScale() {
+        /*cd从小到大的变化x,y:x,y轴偏移距离,scale:缩放倍数*/
         const mini = this.$refs.mini;
-        const offsetLeft = mini.offsetLeft;
-        console.log(offsetLeft);
+        const targetWidth = mini.clientWidth;
+        const offsetLeft = mini.offsetLeft + targetWidth / 2;
+        const offsetBottom = mini.offsetTop + targetWidth / 2;
+        const cdWidth = window.innerWidth * 0.8 / 2;
+        const cdTop = this.$refs.middle.offsetTop;
+        const x = -(cdWidth - offsetLeft);
+        const y = window.innerHeight - cdTop - cdWidth - offsetBottom;
+        const scale = targetWidth / cdWidth;
+        return {x, y, scale}
       },
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
@@ -119,6 +156,11 @@
       })
     },
     watch: {
+      currentSong() {
+        this.$nextTick(() => {
+          this.$refs.audio.play();
+        })
+      },
       playing(newPlaying) {
         const audio = this.$refs.audio;
         this.$nextTick(() => {
@@ -129,6 +171,12 @@
     computed: {
       cdCls() {
         return this.playing ? 'play' : 'play pause';
+      },
+      playIcon() {
+        return this.playing ? 'icon-pause' : 'icon-play';
+      },
+      miniIcon() {
+        return this.playing ? 'icon-pause-mini' : 'icon-play-mini';
       },
       ...mapGetters(['playing', 'fullScreen', 'playListL', 'currentSong'])
     }
@@ -144,8 +192,8 @@
       z-index: 99;
       top: 0;
       bottom: 0;
-      width: 100%;
-      height: 100%;
+      left: 0;
+      right: 0;
       background: @color-background;
       .background {
         position: absolute;
@@ -290,8 +338,8 @@
           }
         }
       }
-      &.normal-enter-to, &.normal-leave-to {
-        transition: all 0.4s linear;
+      &.normal-enter-active, &.normal-leave-active {
+        transition: all 0.4s;
         .top, .bottom {
           transition: all 0.4s cubic-bezier(0.86, 0.18, 0.82, 1.32);
         }
@@ -299,10 +347,10 @@
       &.normal-enter, &.normal-leave-to {
         opacity: 0;
         .top {
-          transform: translate3d(0, -100%, 0);
+          transform: translate3d(0, -100px, 0);
         }
         .bottom {
-          transform: translate3d(0, 100%, 0);
+          transform: translate3d(0, 100px, 0);
         }
       }
     }
@@ -312,9 +360,16 @@
       bottom: 0;
       width: 100%;
       height: 6rem;
+      z-index: 100;
       background: @color-highlight-background;
       display: flex;
       align-items: center;
+      &.mini-enter-active, &.mini-leave-active {
+        transition: all 0.4s;
+      }
+      &.mini-enter, &.mini-leave-to {
+        opacity: 0;
+      }
       .icon {
         flex: 0 0 4rem;
         width: 4rem;

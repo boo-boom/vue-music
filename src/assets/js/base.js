@@ -14,7 +14,7 @@ export function DOMLoaded() {
 export function computedREM() {
   const html = document.documentElement;
   const windowWidth = html.clientWidth;
-  html.style.fontSize = parseInt(windowWidth / 75 * 2) + 'px';
+  html.style.fontSize = parseInt(windowWidth / 750 * 20) + 'px';
 }
 
 /**
@@ -60,7 +60,7 @@ export function getData(el, name, val) {
 /**
  * 添加style兼容前缀
  * @param style
- * @returns {style}
+ * @returns {*}
  */
 let elementStyle = document.createElement('div').style;
 let vendor = (() => {
@@ -71,8 +71,8 @@ let vendor = (() => {
     ms: 'msTransform',
     standard: 'transform'
   };
-  for(let key in transformNames){
-    if(elementStyle[transformNames[key]] !== undefined){
+  for (let key in transformNames) {
+    if (elementStyle[transformNames[key]] !== undefined) {
       return key;
     }
   }
@@ -80,15 +80,19 @@ let vendor = (() => {
 })();
 
 export function prefixStyle(style) {
-  if(vendor === false){
+  if (vendor === false) {
     return false;
   }
-  if(vendor === 'standard'){
+  if (vendor === 'standard') {
     return style;
   }
-  return vendor + style.charAt(0).toUpperCase() + style.substr(1);
+  let nameArr = style.split('-');
+  let nameStr = vendor;
+  nameArr.forEach((item) => {
+    nameStr += item.charAt(0).toUpperCase() + item.substr(1);
+  });
+  return nameStr;
 }
-
 
 
 
