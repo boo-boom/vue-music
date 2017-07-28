@@ -1,5 +1,5 @@
 <template>
-  <div class="player" v-show="playListL.length>0">
+  <div class="player" v-show="playList.length>0">
     <transition name="normal" @enter="enter" @after-enter="afterEnter" @leave="leave" @after-leave="afterLeave">
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
@@ -35,23 +35,24 @@
             <div class="dot lyric"></div>
           </div>
           <div class="progress-wrapper">
-            <span class="time time-l">20</span>
+            <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
               进度条
             </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i class="icon-prev" @click="prev"></i>
             </div>
-            <div class="icon i-center" @click="togglePlaying">
-              <i :class="playIcon"></i>
+            <div class="icon i-center" :class="disableCls">
+              <i :class="playIcon" @click="togglePlaying"></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i class="icon-next" @click="next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -69,28 +70,34 @@
           <h2 class="name">{{currentSong.name}}</h2>
           <p class="desc">{{currentSong.singer}}</p>
         </div>
-        <div class="control" @click.stop="togglePlaying">
-          <i :class="miniIcon"></i>
+        <div class="control">
+          <i :class="miniIcon" @click.stop="togglePlaying"></i>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio"></audio>
+    <audio ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
   import {mapGetters, mapMutations} from 'vuex'
-  import {prefixStyle} from 'assets/js/base'
+  import {prefixStyle} from 'common/js/base'
   import animations from 'create-keyframe-animation'
 
-  const transform = prefixStyle('transform');
   const transition = prefixStyle('transition');
+  const transform = prefixStyle('transform');
 
   export default {
     name: 'player',
+    data() {
+      return {
+        currentTime: 0,
+        songReady: false,
+      }
+    },
     methods: {
       back() {
         this.setFullScreen(false);
@@ -99,18 +106,64 @@
         this.setFullScreen(true);
       },
       togglePlaying() {
+        if (!this.songReady) {
+          return
+        }
         this.setPlayingState(!this.playing);
+      },
+      prev() {
+        if (!this.songReady) {
+          return
+        }
+        let index = this.currentIndex - 1;
+        if (index === -1) {
+          index = this.playList.length - 1
+        }
+        this.setCurrentIndex(index);
+        if (!this.playing) {
+          this.togglePlaying();
+        }
+        this.songReady = false;
+      },
+      next() {
+        if (!this.songReady) {
+          return
+        }
+        let index = this.currentIndex + 1;
+        if (index === this.playList.length) {
+          index = 0;
+        }
+        this.setCurrentIndex(index);
+        if (!this.playing) {
+          this.togglePlaying();
+        }
+        this.songReady = false;
+      },
+      updateTime(e) {
+        this.currentTime = e.target.currentTime;
+      },
+      format(interval) {
+        interval = interval | 0;
+        const minute = interval / 60 | 0;
+        const second = this._pad(interval % 60);
+        return `${minute}:${second}`;
+      },
+      ready() {
+        this.songReady = true;
+      },
+      error() {
+        this.songReady = true;
       },
       enter(el, done) {
         const {x, y, scale} = this._getPosScale();
         let animation = {
-          0:{
+          0: {
             transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
           },
-          60:{
+          60: {
             transform: `translate3d(0,0,0) scale(1.1)`
           },
-          100:{
+          100: {
             transform: `translate3d(0,0,0) scale(1)`
           }
         };
@@ -135,6 +188,7 @@
         this.$refs.cdWrapper.addEventListener('transitionend', done);
       },
       afterLeave(el) {
+        this.$refs.cdWrapper.style[transition] = '';
         this.$refs.cdWrapper.style[transform] = '';
       },
       _getPosScale() {
@@ -150,9 +204,17 @@
         const scale = targetWidth / cdWidth;
         return {x, y, scale}
       },
+      _pad(num, n = 2) {
+        let len = num.toString().length;
+        if(len < n) {
+          return '0' + num;
+        }
+        return num
+      },
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
-        setPlayingState: 'SET_PLAYING_STATE'
+        setPlayingState: 'SET_PLAYING_STATE',
+        setCurrentIndex: 'SET_CURRENT_INDEX'
       })
     },
     watch: {
@@ -178,14 +240,17 @@
       miniIcon() {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini';
       },
-      ...mapGetters(['playing', 'fullScreen', 'playListL', 'currentSong'])
+      disableCls() {
+        return this.songReady ? '' : 'disable'
+      },
+      ...mapGetters(['playing', 'fullScreen', 'playList', 'currentSong', 'currentIndex'])
     }
   }
 </script>
 
 <style lang="less" rel="stylesheet/less" scoped>
-  @import "~assets/css/variable";
-  @import "~assets/css/mixin";
+  @import "~common/css/variable";
+  @import "~common/css/mixin";
   .player {
     .normal-player {
       position: fixed;
@@ -319,6 +384,24 @@
           }
         }
         .progress-wrapper {
+          display: flex;
+          align-items: center;
+          width: 80%;
+          margin: 0 auto;
+          padding: 1rem 0;
+          .time {
+            color: @color-text;
+            font-size: @font-size-small;
+            flex: 0 0 3rem;
+            line-height: 3rem;
+            width: 3rem;
+            &.time-l {
+              text-align: left;
+            }
+            &.time-r {
+              text-align: right;
+            }
+          }
         }
         .operators {
           display: flex;
@@ -327,6 +410,9 @@
           .icon {
             flex: 1;
             color: @color-theme;
+            &.disable{
+              color: @color-theme-d;
+            }
             i {
               font-size: 3rem;
             }

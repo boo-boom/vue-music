@@ -84,7 +84,7 @@
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-  @import '~assets/css/variable';
+  @import '~common/css/variable';
   .recommend {
     position: fixed;
     width: 100%;

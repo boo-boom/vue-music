@@ -33,7 +33,7 @@
 <script>
   import Scroll from 'base/scroll';
   import Loading from 'base/loading';
-  import {getData} from 'assets/js/base';
+  import {getData} from 'common/js/base';
 
   export default {
     name: 'listview',
@@ -151,7 +151,7 @@
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-  @import '~assets/css/variable';
+  @import '~common/css/variable';
   .listview {
     position: relative;
     width: 100%;

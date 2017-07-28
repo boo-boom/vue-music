@@ -4,13 +4,13 @@ import router from './router';
 import store from './store';
 import fastclick from 'fastclick';
 import VueLazyLoad from 'vue-lazyload';
-import {DOMLoaded, computedREM} from 'assets/js/base';
-import 'assets/css/common.less';
+import {DOMLoaded, computedREM} from 'common/js/base';
+import 'common/css/common.less';
 
 fastclick.attach(document.body);
 
 Vue.use(VueLazyLoad, {
-  loading: require('assets/image/default.png')
+  loading: require('common/image/default.png')
 });
 
 DOMLoaded();

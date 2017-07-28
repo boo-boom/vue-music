@@ -23,7 +23,7 @@
 
 <script>
   import {mapActions} from 'vuex'
-  import {prefixStyle} from 'assets/js/base'
+  import {prefixStyle} from 'common/js/base'
   import Scroll from 'base/scroll.vue'
   import SongList from 'base/song_list.vue'
 
@@ -112,8 +112,8 @@
 </script>
 
 <style lang="less" rel="stylesheet/less" scoped>
-  @import "~assets/css/variable.less";
-  @import "~assets/css/mixin.less";
+  @import "~common/css/variable.less";
+  @import "~common/css/mixin.less";
   .music-list {
     position: fixed;
     top: 0;
@@ -151,7 +151,7 @@
       width: 100%;
       height: 0;
       padding-bottom: 70%;
-      //background: url("../assets/image/test_big.jpg") no-repeat;
+      //background: url("../common/image/test_big.jpg") no-repeat;
       background-repeat: no-repeat;
       background-size: cover;
       .play-wrapper {

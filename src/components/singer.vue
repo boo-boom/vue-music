@@ -9,7 +9,7 @@
   import {mapMutations} from 'vuex';
   import {ERR_OK} from 'api/config';
   import ListView from 'base/listview';
-  import Singer from 'assets/js/singer';
+  import Singer from 'common/js/singer';
   import {getSingerList} from 'api/singer';
 
   export default {

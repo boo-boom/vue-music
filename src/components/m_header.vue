@@ -12,8 +12,8 @@ export default {
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-  @import '~assets/css/variable.less';
-  @import '~assets/css/mixin.less';
+  @import '~common/css/variable.less';
+  @import '~common/css/mixin.less';
   .m-header{
     height: 4.4rem;
     text-align: center;
@@ -27,7 +27,7 @@ export default {
       margin-top: 0.9rem;
       margin-right: 0.9rem;
       background-size: 2.4rem 2.6rem;
-      .bg-img('~assets/image/logo');
+      .bg-img('~common/image/logo');
     }
     .text{
       display: inline-block;

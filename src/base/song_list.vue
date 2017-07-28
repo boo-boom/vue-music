@@ -36,8 +36,8 @@
 </script>
 
 <style lang="less" rel="stylesheet/less" scoped>
-  @import "~assets/css/variable.less";
-  @import "~assets/css/mixin.less";
+  @import "~common/css/variable.less";
+  @import "~common/css/mixin.less";
 
   .song-list{
     .item{

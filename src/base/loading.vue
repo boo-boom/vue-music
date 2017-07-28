@@ -1,6 +1,6 @@
 <template>
     <div class="loading">
-        <img width="24" height="24" src="~assets/image/loading.gif">
+        <img width="24" height="24" src="~common/image/loading.gif">
         <p class="desc">{{title}}</p>
     </div>
 </template>
@@ -18,7 +18,7 @@ export default {
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-@import '~assets/css/variable';
+@import '~common/css/variable';
 .loading {
     width: 100%;
     text-align: center;

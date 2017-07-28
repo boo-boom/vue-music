@@ -11,7 +11,7 @@
 
 <script>
 import BScroll from 'better-scroll';
-import { addClass } from 'assets/js/base';
+import { addClass } from 'common/js/base';
 export default {
     name: 'slider',
     props: {
@@ -108,8 +108,8 @@ export default {
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-@import '~assets/css/variable.less';
-@import '~assets/css/mixin.less';
+@import '~common/css/variable.less';
+@import '~common/css/mixin.less';
 .slider {
     min-height: 1px;
     position: relative;

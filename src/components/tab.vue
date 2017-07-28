@@ -22,7 +22,7 @@ export default {
 </script>
 
 <style rel="stylesheet/less" lang="less" scoped>
-    @import '~assets/css/variable.less';
+    @import '~common/css/variable.less';
     .tab{
         display: flex;
         height: 4.4rem;
