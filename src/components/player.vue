@@ -37,7 +37,7 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              进度条
+              <progress-bar></progress-bar>
             </div>
             <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
@@ -86,12 +86,14 @@
   import {mapGetters, mapMutations} from 'vuex'
   import {prefixStyle} from 'common/js/base'
   import animations from 'create-keyframe-animation'
+  import progressBar from './../base/progress_bar'
 
   const transition = prefixStyle('transition');
   const transform = prefixStyle('transform');
 
   export default {
     name: 'player',
+    components: {progressBar},
     data() {
       return {
         currentTime: 0,
