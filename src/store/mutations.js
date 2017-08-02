@@ -18,6 +18,9 @@ const mutations = {
   },
   [types.SET_CURRENT_INDEX](state, index){
     state.currentIndex = index;
+  },
+  [types.SET_PLAYER_MODE](state, mode){
+    state.mode = mode;
   }
 };
 
