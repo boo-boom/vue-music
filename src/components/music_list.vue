@@ -6,7 +6,7 @@
     <h1 class="title" ref="title">{{name}}</h1>
     <div class="bg-image" :style="bgStyle" ref="bgImg">
       <div class="play-wrapper">
-        <div class="play" ref="playBtn">
+        <div class="play" ref="playBtn" @click="allRandom">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -74,7 +74,12 @@
           index: index
         });
       },
-      ...mapActions(['selectPlay'])
+      allRandom() {
+        this.randomPlay({
+          list: this.songs
+        });
+      },
+      ...mapActions(['selectPlay', 'randomPlay'])
     },
     watch: {
       scrollY(newY) {

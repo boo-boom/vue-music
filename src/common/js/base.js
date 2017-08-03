@@ -94,11 +94,40 @@ export function prefixStyle(style) {
   return nameStr;
 }
 
+/**
+ * 随机数组
+ * @param arr
+ * @returns {[]}
+ */
+export function shuffle(arr) {
+  const _arr = arr.slice();
+  for (let i = 0; i < _arr.length; i++) {
+    let t = _arr[i];
+    let j = random(0, i);
+    _arr[i] = _arr[j];
+    _arr[j] = t;
+  }
+  return _arr;
+}
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
-
-
-
-
+/**
+ * 获取指定数组元素索引
+ * @param list
+ * @param song
+ * @returns {number}
+ */
+export function findIndex(list, song) {
+  let _index = 0;
+  list.forEach((item, index) => {
+    if(item.id === song.id){
+      _index = index;
+    }
+  });
+  return _index;
+}
 
 
 
