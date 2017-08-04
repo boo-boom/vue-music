@@ -1,22 +1,22 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref="recommend">
     <scroll class="recommend-content" :data="discList" ref="scroll">
       <div>
         <div class="slider-wrapper" v-if="recommends.length">
-          <Slider>
-            <div v-for="(item, index) in recommends" :key="index">
+          <slider>
+            <div v-for="item in recommends">
               <a href="javasctipt:;">
                 <!-- :href="item.linkUrl" -->
                 <!-- item.id -->
                 <img class="needsclick" :src="item.picUrl" @load="loadImage"><!-- needsclick: fastclick不阻止事件 -->
               </a>
             </div>
-          </Slider>
+          </slider>
         </div>
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li class="item" v-for="(item, index) in discList" :key="index">
+            <li class="item" v-for="item in discList">
               <div class="icon">
                 <img v-lazy="item.imgurl">
               </div>
@@ -41,9 +41,11 @@
   import Slider from 'base/slider';
   import Loading from 'base/loading';
   import Scroll from 'base/scroll';
+  import {playListMixin} from 'common/js/mixin';
 
   export default {
     name: 'recommend',
+    mixins: [playListMixin],
     components: {Slider, Loading, Scroll},
     data() {
       return {
@@ -56,6 +58,18 @@
       this._getDiscList();
     },
     methods: {
+      handlePlayList(playlist) {
+        const bottom = playlist.length > 0 ? '6rem' : '';
+        this.$refs.recommend.style.bottom = bottom;
+        this.$refs.scroll.refresh();
+      },
+      // 图片加载时执行一次
+      loadImage() {
+        if (!this.checkloaded) {
+          this.checkloaded = true;
+          this.$refs.scroll.refresh();
+        }
+      },
       // 获取轮播图数据
       _getRecommend() {
         getRecommend().then((res) => {
@@ -71,13 +85,6 @@
             this.discList = res.data.list;
           }
         });
-      },
-      // 图片加载时执行一次
-      loadImage() {
-        if (!this.checkloaded) {
-          this.checkloaded = true;
-          this.$refs.scroll.refresh();
-        }
       }
     }
   }

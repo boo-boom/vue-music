@@ -26,12 +26,14 @@
   import {prefixStyle} from 'common/js/base'
   import Scroll from 'base/scroll.vue'
   import SongList from 'base/song_list.vue'
+  import {playListMixin} from 'common/js/mixin'
 
   const transform = prefixStyle('transform');
   const backdrop = prefixStyle('backdrop-filter');
 
   export default {
     name: 'musicList',
+    mixins: [playListMixin],
     components: {Scroll, SongList},
     props: {
       songs: {
@@ -62,6 +64,11 @@
       this.$refs.list.$el.style.top = `${this.imageHeight}px`;
     },
     methods: {
+      handlePlayList(playList) {
+        const bottom = playList.length > 0 ? '6rem' : '';
+        this.$refs.list.$el.style.bottom = bottom;
+        this.$refs.list.refresh();
+      },
       scroll(pos) {
         this.scrollY = pos.y | 0;
       },

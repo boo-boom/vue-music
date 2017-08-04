@@ -1,6 +1,6 @@
 <template>
-  <div class="singer">
-    <list-view :data='singers' @select="selectSinger"></list-view>
+  <div class="singer" ref="singer">
+    <list-view :data='singers' @select="selectSinger" ref="listView"></list-view>
     <router-view></router-view>
   </div>
 </template>
@@ -11,9 +11,11 @@
   import ListView from 'base/listview';
   import Singer from 'common/js/singer';
   import {getSingerList} from 'api/singer';
+  import {playListMixin} from 'common/js/mixin';
 
   export default {
     name: 'singer',
+    mixins: [playListMixin],
     components: {ListView},
     data() {
       return {
@@ -24,6 +26,11 @@
       this._getSingerList();
     },
     methods: {
+      handlePlayList(playList) {
+        const bottom = playList.length > 0 ? '6rem' : '';
+        this.$refs.singer.style.bottom = bottom;
+        this.$refs.listView.refresh();
+      },
       selectSinger(singer) {
         this.$router.push({
           path: `/singer/${singer.id}`

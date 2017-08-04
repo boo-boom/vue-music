@@ -85,6 +85,9 @@
       scroll(pos) {
         this.scrollY = pos.y;
       },
+      refresh() {
+        this.$refs.listview.refresh();
+      },
       // 获取每个列表的高度并添加到数组中
       _calculateHeight() {
         const list = this.$refs.listGroup;
