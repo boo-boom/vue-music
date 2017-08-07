@@ -15,7 +15,7 @@
     </div>
     <scroll class="list" :data="songs" :listenScroll="listenScroll" :probeType="probeType" @scroll="scroll" ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="selectItem"></song-list>
+        <song-list :songs="songs" @select="selectItem" :rank="rank"></song-list>
       </div>
     </scroll>
   </div>
@@ -47,6 +47,10 @@
       avatar: {
         type: String,
         default: ''
+      },
+      rank: {
+        type: Boolean,
+        default: false
       }
     },
     data() {

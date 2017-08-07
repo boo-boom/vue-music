@@ -95,7 +95,7 @@
   import {prefixStyle, shuffle, findIndex} from 'common/js/base'
   import animations from 'create-keyframe-animation'
   import progressBar from 'base/progress_bar'
-  import progressCircle from 'components/progress-circle'
+  import progressCircle from 'components/progress_circle'
   import {playMode} from 'common/js/config'
   import Lyric from 'lyric-parser'
   import Scroll from 'base/scroll'

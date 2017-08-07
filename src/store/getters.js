@@ -8,7 +8,9 @@ const getters = {
   currentSong: (state) => {
     return state.playList[state.currentIndex] || {};
   },
-  mode: state => state.mode
+  mode: state => state.mode,
+  disc: state => state.disc,
+  topList: state => state.topList,
 };
 
 export default getters;
