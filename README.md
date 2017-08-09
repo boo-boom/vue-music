@@ -1,6 +1,6 @@
-# vue-music-1
+# vue-QQMusic
 
-> music
+> vue2.0
 
 ## Build Setup
 
